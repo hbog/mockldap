@@ -57,6 +57,11 @@ class MockLdap(object):
         if self.ldap_objects is not None:
             raise Exception("You can't add a directory after calling start().")
 
+        for obj in directory.values():
+            for attr in obj.values():
+                if any(not isinstance(_, bytes) for _ in attr):
+                    raise TypeError("expected a byte string in the list")
+
         self.directories[uri] = cidict(map_keys(lambda s: s.lower(), directory))
 
     def start(self, path='ldap.initialize'):

@@ -137,6 +137,7 @@ class Test(Token):
         elif self.value == u'*':
             matches = len(values) > 0
         else:
+            values = map(lambda x: x.decode('utf-8'), values)
             matches = self.value in values
 
         return matches

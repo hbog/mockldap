@@ -12,26 +12,26 @@ from mockldap import MockLdap
 from mockldap.recording import SeedRequired
 
 
-test = ("o=test", {"objectClass": ["top"]})
-example = ("ou=example,o=test", {"objectClass": ["top"]})
-other = ("ou=other,o=test", {"objectClass": ["top"]})
+test = ("o=test", {"objectClass": [b"top"]})
+example = ("ou=example,o=test", {"objectClass": [b"top"]})
+other = ("ou=other,o=test", {"objectClass": [b"top"]})
 
 manager = ("cn=manager,ou=example,o=test", {
-    "userPassword": ["ldaptest"],
-    "objectClass": ["top", "posixAccount", "inetOrgPerson"]})
+    "userPassword": [b"ldaptest"],
+    "objectClass": [b"top", b"posixAccount", b"inetOrgPerson"]})
 alice = ("cn=alice,ou=example,o=test", {
-    "cn": ["alice"], "uid": ["alice"], "userPassword": ["alicepw"],
-    "objectClass": ["top", "posixAccount"]})
+    "cn": [b"alice"], "uid": [b"alice"], "userPassword": [b"alicepw"],
+    "objectClass": [b"top", b"posixAccount"]})
 # Passwords generated with slappasswd
 theo = ("cn=theo,ou=example,o=test", {"userPassword": [
-    "{CRYPT}Q7BT9BT8qXW/k",
-    "{SSHA}ecL6T4anvrFI2ixn2XnrE0roM5TeoLLE",
-    "{SSHA}/WoozYVlR2BXTCDCWpZG8+IqnF1GWhJbbCSVXQ=="],
-    "objectClass": ["top", "posixAccount"]})
-john = ("cn=john,ou=example,o=test", {"objectClass": ["top"]})
+    b"{CRYPT}Q7BT9BT8qXW/k",
+    b"{SSHA}ecL6T4anvrFI2ixn2XnrE0roM5TeoLLE",
+    b"{SSHA}/WoozYVlR2BXTCDCWpZG8+IqnF1GWhJbbCSVXQ=="],
+    "objectClass": [b"top", b"posixAccount"]})
+john = ("cn=john,ou=example,o=test", {"objectClass": [b"top"]})
 
 bob = ("cn=bob,ou=other,o=test", {
-    "userPassword": ["bobpw", "bobpw2"], "objectClass": ["top"]})
+    "userPassword": [b"bobpw", b"bobpw2"], "objectClass": [b"top"]})
 
 directory = dict([test, example, other, manager, alice, theo, john, bob])
 
@@ -210,8 +210,8 @@ class TestLDAPObject(unittest.TestCase):
     def test_search_s_mixed_case_dn(self):
         dn = "cn=Edward,ou=example,o=test"
         attrs = {
-            "objectClass": ["top"],
-            "cn": ["Edward"],
+            "objectClass": [b"top"],
+            "cn": [b"Edward"],
         }
         ldif = ldap.modlist.addModlist(attrs)
         self.ldapobj.add_s(dn, ldif)
@@ -317,9 +317,9 @@ class TestLDAPObject(unittest.TestCase):
     def test_add_s_success_code(self):
         dn = 'cn=mike,ou=example,o=test'
         attrs = {
-            'objectClass': ['top', 'organizationalRole'],
-            'cn': ['mike'],
-            'userPassword': ['mikepw'],
+            'objectClass': [b'top', b'organizationalRole'],
+            'cn': [b'mike'],
+            'userPassword': [b'mikepw'],
         }
         ldif = ldap.modlist.addModlist(attrs)
 
@@ -330,9 +330,9 @@ class TestLDAPObject(unittest.TestCase):
     def test_add_s_successfully_add_object(self):
         dn = 'cn=mike,ou=example,o=test'
         attrs = {
-            'objectClass': ['top', 'organizationalRole'],
-            'cn': ['mike'],
-            'userPassword': ['mikepw'],
+            'objectClass': [b'top', b'organizationalRole'],
+            'cn': [b'mike'],
+            'userPassword': [b'mikepw'],
         }
         ldif = ldap.modlist.addModlist(attrs)
 
@@ -341,7 +341,7 @@ class TestLDAPObject(unittest.TestCase):
         self.assertEqual(self.ldapobj.directory[dn], attrs)
 
     def test_add_s_already_exists(self):
-        attrs = {'cn': ['mike']}
+        attrs = {'cn': [b'mike']}
         ldif = ldap.modlist.addModlist(attrs)
 
         with self.assertRaises(ldap.ALREADY_EXISTS):
@@ -351,9 +351,9 @@ class TestLDAPObject(unittest.TestCase):
     def test_add_s_invalid_dn(self):
         dn = 'invalid'
         attrs = {
-            'objectClass': ['top', 'organizationalRole'],
-            'cn': ['mike'],
-            'userPassword': ['mikepw'],
+            'objectClass': [b'top', b'organizationalRole'],
+            'cn': [b'mike'],
+            'userPassword': [b'mikepw'],
         }
         ldif = ldap.modlist.addModlist(attrs)
 
@@ -361,13 +361,13 @@ class TestLDAPObject(unittest.TestCase):
             self.ldapobj.add_s(dn, ldif)
 
     def test_modify_s_no_such_object(self):
-        mod_list = [(ldap.MOD_REPLACE, 'userPassword', 'test')]
+        mod_list = [(ldap.MOD_REPLACE, 'userPassword', b'test')]
 
         with self.assertRaises(ldap.NO_SUCH_OBJECT):
             self.ldapobj.modify_s('ou=invalid,o=test', mod_list)
 
     def test_modify_s_success_code(self):
-        new_pw = ['alice', 'alicepw2']
+        new_pw = [b'alice', b'alicepw2']
         mod_list = [(ldap.MOD_REPLACE, 'userPassword', new_pw)]
 
         result = self.ldapobj.modify_s(alice[0], mod_list)
@@ -375,7 +375,7 @@ class TestLDAPObject(unittest.TestCase):
         self.assertEqual(result, (103, []))
 
     def test_modify_s_replace_value_of_attribute_with_multiple_others(self):
-        new_pw = ['alice', 'alicepw2']
+        new_pw = [b'alice', b'alicepw2']
         mod_list = [(ldap.MOD_REPLACE, 'userPassword', new_pw)]
 
         self.ldapobj.modify_s(alice[0], mod_list)
@@ -384,7 +384,7 @@ class TestLDAPObject(unittest.TestCase):
                          new_pw)
 
     def test_modify_s_replace_value_of_attribute_with_another_single(self):
-        new_pw = 'alice'
+        new_pw = b'alice'
         mod_list = [(ldap.MOD_REPLACE, 'userPassword', new_pw)]
 
         self.ldapobj.modify_s(alice[0], mod_list)
@@ -402,7 +402,7 @@ class TestLDAPObject(unittest.TestCase):
 
     def test_modify_s_add_single_value_to_attribute(self):
         old_pw = copy(self.ldapobj.directory[alice[0]]['userPassword'])
-        new_pw = 'test'
+        new_pw = b'test'
         mod_list = [(ldap.MOD_ADD, 'userPassword', new_pw)]
 
         self.ldapobj.modify_s(alice[0], mod_list)
@@ -412,7 +412,7 @@ class TestLDAPObject(unittest.TestCase):
 
     def test_modify_s_add_multiple_values_to_attribute(self):
         old_pw = copy(self.ldapobj.directory[alice[0]]['userPassword'])
-        new_pw = ['test1', 'test2']
+        new_pw = [b'test1', b'test2']
         mod_list = [(ldap.MOD_ADD, 'userPassword', new_pw)]
 
         self.ldapobj.modify_s(alice[0], mod_list)
@@ -422,9 +422,9 @@ class TestLDAPObject(unittest.TestCase):
 
     def test_modify_s_create_on_add(self):
         """ Create an attribute by adding the first value. """
-        self.ldapobj.modify_s(alice[0], [(ldap.MOD_ADD, 'someAttr', 'value')])
+        self.ldapobj.modify_s(alice[0], [(ldap.MOD_ADD, 'someAttr', b'value')])
 
-        self.assertEqual(self.ldapobj.directory[alice[0]]['someAttr'], ['value'])
+        self.assertEqual(self.ldapobj.directory[alice[0]]['someAttr'], [b'value'])
 
     def test_modify_s_add_none_value_raises_protocol_error(self):
         mod_list = [(ldap.MOD_ADD, 'userPassword', None)]
@@ -434,7 +434,7 @@ class TestLDAPObject(unittest.TestCase):
 
     def test_modify_s_dont_add_already_existing_value(self):
         old_pw = copy(self.ldapobj.directory[bob[0]]['userPassword'])
-        mod_list = [(ldap.MOD_ADD, 'userPassword', 'bobpw')]
+        mod_list = [(ldap.MOD_ADD, 'userPassword', b'bobpw')]
 
         self.ldapobj.modify_s(bob[0], mod_list)
 
@@ -442,20 +442,20 @@ class TestLDAPObject(unittest.TestCase):
                          old_pw)
 
     def test_modify_s_delete_single_value_from_attribute(self):
-        mod_list = [(ldap.MOD_DELETE, 'userPassword', 'bobpw')]
+        mod_list = [(ldap.MOD_DELETE, 'userPassword', b'bobpw')]
 
         self.ldapobj.modify_s(bob[0], mod_list)
 
         self.assertEqual(self.ldapobj.directory[bob[0]]['userPassword'],
-                         ['bobpw2'])
+                         [b'bobpw2'])
 
     def test_modify_s_delete_multiple_values_from_attribute(self):
-        mod_list = [(ldap.MOD_DELETE, 'objectClass', ['top', 'inetOrgPerson'])]
+        mod_list = [(ldap.MOD_DELETE, 'objectClass', [b'top', b'inetOrgPerson'])]
 
         self.ldapobj.modify_s(manager[0], mod_list)
 
         self.assertEqual(self.ldapobj.directory[manager[0]]['objectClass'],
-                         ['posixAccount'])
+                         [b'posixAccount'])
 
     def test_modify_s_delete_all_values_from_attribute(self):
         mod_list = [(ldap.MOD_DELETE, 'objectClass', None)]
@@ -494,7 +494,7 @@ class TestLDAPObject(unittest.TestCase):
 
         self.assertEqual(
             self.ldapobj.directory['uid=alice1,ou=example,o=test']['uid'],
-            ['alice', 'alice1']
+            [b'alice', b'alice1']
         )
 
     def test_rename_s_only_rdn_create_new_attr(self):
@@ -502,7 +502,7 @@ class TestLDAPObject(unittest.TestCase):
 
         self.assertIn('sn', self.ldapobj.directory['sn=alice1,ou=example,o=test'])
         self.assertEqual(self.ldapobj.directory['sn=alice1,ou=example,o=test']['sn'],
-                         ['alice1'])
+                         [b'alice1'])
 
     def test_rename_s_removes_old_dn(self):
         self.ldapobj.rename_s(alice[0], 'uid=alice1')
@@ -515,13 +515,13 @@ class TestLDAPObject(unittest.TestCase):
         self.assertNotIn('cn', self.ldapobj.directory['uid=alice1,ou=example,o=test'])
 
     def test_rename_s_does_not_remove_multivalued_old_attr(self):
-        self.ldapobj.directory[alice[0]]['cn'].append('alice1')
+        self.ldapobj.directory[alice[0]]['cn'].append(b'alice1')
 
         self.ldapobj.rename_s(alice[0], 'uid=alice1')
 
         self.assertIn('cn', self.ldapobj.directory['uid=alice1,ou=example,o=test'])
-        self.assertIn('alice1', self.ldapobj.directory['uid=alice1,ou=example,o=test']['cn'])
-        self.assertNotIn('alice', self.ldapobj.directory['uid=alice1,ou=example,o=test']['cn'])
+        self.assertIn(b'alice1', self.ldapobj.directory['uid=alice1,ou=example,o=test']['cn'])
+        self.assertNotIn(b'alice', self.ldapobj.directory['uid=alice1,ou=example,o=test']['cn'])
 
     def test_rename_s_newsuperior_check_dn(self):
         self.ldapobj.rename_s(alice[0], 'uid=alice1', 'ou=new,o=test')
@@ -533,7 +533,7 @@ class TestLDAPObject(unittest.TestCase):
 
         self.assertEqual(
             self.ldapobj.directory['cn=alice,ou=other,o=test']['cn'],
-            ['alice']
+            [b'alice']
         )
 
     def test_rename_s_no_such_object(self):

@@ -196,7 +196,7 @@ class LDAPObject(RecordableMethods):
         self._check_valid_dn(dn)
 
         try:
-            values = self.directory[dn].get(attr, [])
+            values = map(lambda x: x.decode('utf-8'), self.directory[dn].get(attr, []))
         except KeyError:
             raise ldap.NO_SUCH_OBJECT
 
@@ -299,6 +299,9 @@ class LDAPObject(RecordableMethods):
                 if value == []:
                     raise ldap.PROTOCOL_ERROR
 
+                if any(not isinstance(item, bytes) for item in value):
+                    raise TypeError("expected a byte string in the list")
+
                 if key not in entry:
                     entry[key] = value
                 else:
@@ -311,6 +314,9 @@ class LDAPObject(RecordableMethods):
                 elif value == []:
                     del entry[key]
                 else:
+                    if any(not isinstance(item, bytes) for item in value):
+                        raise TypeError("expected a byte string in the list")
+
                     entry[key] = [v for v in entry[key] if v not in value]
                     if entry[key] == []:
                         del entry[key]
@@ -319,6 +325,9 @@ class LDAPObject(RecordableMethods):
                     if key in entry:
                         del entry[key]
                 else:
+                    if any(not isinstance(item, bytes) for item in value):
+                        raise TypeError("expected a byte string in the list")
+
                     entry[key] = value
 
         return (103, [])
@@ -329,6 +338,9 @@ class LDAPObject(RecordableMethods):
         entry = {}
         dn = str(dn)
         for item in record:
+            if any(not isinstance(_, bytes) for _ in item[1]):
+                raise TypeError("expected a byte string in the list")
+
             entry[item[0]] = list(item[1])
         try:
             self.directory[dn]
@@ -359,6 +371,9 @@ class LDAPObject(RecordableMethods):
 
         oldattr, oldvalue = dn.split(',')[0].split('=')
         newattr, newvalue = newrdn.split('=')
+
+        oldvalue = oldvalue.encode('utf-8')
+        newvalue = newvalue.encode('utf-8')
 
         if oldattr == newattr or len(entry[oldattr]) > 1:
             entry[oldattr].remove(oldvalue)
