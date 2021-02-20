@@ -1,7 +1,6 @@
 """
 Simple filter expression parser based on funcparserlib.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
 
 from functools import partial
 import ldap

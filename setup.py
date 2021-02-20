@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-from __future__ import absolute_import, division, print_function, unicode_literals
+#!/usr/bin/env python3
 
 from setuptools import setup
 
@@ -28,7 +26,6 @@ setup(
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication',
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP',
