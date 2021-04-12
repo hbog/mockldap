@@ -81,6 +81,11 @@ class LDAPObject(RecordableMethods):
         self.options[option] = invalue
 
     @recorded
+    def sasl_external_bind_s(self,serverctrls=None,clientctrls=None,sasl_flags=ldap.SASL_QUIET,authz_id=''):
+        """ This only exists for recording purposes. """
+        pass
+
+    @recorded
     def simple_bind_s(self, who='', cred=''):
         """
         """
